@@ -43,7 +43,6 @@ ras_request_init(
 ) {
   require(request, EFAULT);
   require(options.storage, EINVAL);
-  require(options.callback, EINVAL);
   require(memset(request, 0, sizeof(struct ras_request_s)), EFAULT);
 
   request->callback = ras_request_callback;
@@ -82,7 +81,22 @@ ras_request_run(struct ras_request_s *request) {
   require(request, EFAULT);
   require(request->storage, EFAULT);
 
+  if (0 != request->err) {
+    return ras_request_callback(request, request->err, 0, 0);
+  }
+
   request->storage->pending++;
+
+  memcpy(
+    &(request->storage->last_request),
+    request,
+    sizeof(struct ras_request_s));
+
+  request->storage->last_request.data = 0;
+  request->storage->last_request.done = 0;
+  request->storage->last_request.after = 0;
+  request->storage->last_request.before = 0;
+  request->storage->last_request.callback = 0;
 
   if (0 != request->before) {
     request->before(request, request->err, request->data, request->size);
@@ -93,6 +107,8 @@ ras_request_run(struct ras_request_s *request) {
       if (OPEN == readystate(request)) {
         if (0 != request->storage->options.read) {
           request->storage->options.read(request);
+        } else {
+          return ras_request_callback(request, ENOSYS, 0, 0);
         }
       }
       break;
@@ -101,6 +117,8 @@ ras_request_run(struct ras_request_s *request) {
       if (OPEN == readystate(request)) {
         if (0 != request->storage->options.write) {
           request->storage->options.write(request);
+        } else {
+          return ras_request_callback(request, ENOSYS, 0, 0);
         }
       }
       break;
@@ -109,6 +127,8 @@ ras_request_run(struct ras_request_s *request) {
       if (OPEN == readystate(request)) {
         if (0 != request->storage->options.del) {
           request->storage->options.del(request);
+        } else {
+          return ras_request_callback(request, ENOSYS, 0, 0);
         }
       }
       break;
@@ -117,41 +137,49 @@ ras_request_run(struct ras_request_s *request) {
       if (OPEN == readystate(request)) {
         if (0 != request->storage->options.stat) {
           request->storage->options.stat(request);
+        } else {
+          return ras_request_callback(request, ENOSYS, 0, 0);
         }
       }
       break;
 
     case RAS_REQUEST_OPEN:
       if (1 == request->storage->opened && 0 == request->storage->needs_open) {
-        ras_request_callback(request, 0, 0, 0);
+        return ras_request_callback(request, 0, 0, 0);
       } else {
         request->storage->needs_open = 0;
         if (1 == request->storage->prefer_read_only) {
           request->storage->options.open_read_only(request);
         } else if (0 != request->storage->options.open) {
           request->storage->options.open(request);
+        } else {
+          return ras_request_callback(request, ENOSYS, 0, 0);
         }
       }
       break;
 
     case RAS_REQUEST_CLOSE:
       if (1 == request->storage->closed || 0 == request->storage->opened) {
-        ras_request_callback(request, 0, 0, 0);
+        return ras_request_callback(request, 0, 0, 0);
       } else if (0 != request->storage->options.close) {
         request->storage->options.close(request);
+      } else {
+        return ras_request_callback(request, 0, 0, 0);
       }
       break;
 
     case RAS_REQUEST_DESTROY:
       if (1 == request->storage->destroyed) {
-        ras_request_callback(request, 0, 0, 0);
+        return ras_request_callback(request, 0, 0, 0);
       } else if (0 != request->storage->options.destroy) {
         request->storage->options.destroy(request);
+      } else {
+        return ras_request_callback(request, 0, 0, 0);
       }
       break;
 
     case RAS_REQUEST_NONE:
-      ras_request_callback(request, 0, 0, 0);
+      return ras_request_callback(request, ENOSYS, 0, 0);
       break;
   }
 
@@ -241,6 +269,8 @@ ras_request_callback(
   void *done = request->done;
   int rc = ras_request_dequeue(request, err);
 
+  request->err = err;
+
   if (0 != rc) {
     return rc;
   }
@@ -293,6 +323,5 @@ ras_request_callback(
     request->after(request, err, value, size);
   }
 
-  return 0;
+  return err;
 }
-
