@@ -93,6 +93,11 @@ typedef void (ras_storage_destroy_callback_t)(
 /**
  * Fields for `struct ras_storage_options_s` that can be used for
  * extending structures that ensure correct memory layout.
+ *
+ * layout= [
+ *   open_read_only=0, open=1, read=2, write=3,
+ *   del=4, stat=5, close=6, destroy=7, data=8,
+ * ]
  */
 #define RAS_STORAGE_OPTIONS_FIELDS                \
   ras_storage_request_callback_t *open_read_only; \
@@ -129,6 +134,7 @@ struct ras_storage_options_s {
   unsigned int destroyed:1;                                    \
   unsigned int needs_open:1;                                   \
   unsigned int prefer_read_only:1;                             \
+  struct ras_request_s last_request;                           \
   struct ras_request_s *queue[RAS_STORAGE_MAX_REQUEST_QUEUE];  \
   struct ras_storage_options_s options;                        \
   const void *data;

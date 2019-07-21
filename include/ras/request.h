@@ -2,7 +2,6 @@
 #define RAS_REQUEST_H
 
 #include "platform.h"
-#include "storage.h"
 
 // Forward declarations
 struct ras_request_s;
