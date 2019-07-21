@@ -141,6 +141,20 @@ struct ras_storage_s {
 };
 
 /**
+ * Fields for `struct ras_storage_stats_s` that can be used for
+ * extending structures that ensure correct memory layout.
+ */
+#define RAS_STORAGE_STATS_FIELDS \
+  unsigned long int size;
+
+/**
+ * Represents the state for random access storage stats.
+ */
+struct ras_storage_stats_s {
+  RAS_STORAGE_STATS_FIELDS
+};
+
+/**
  * Allocates a pointer to 'struct ras_storage_s'.
  * Calls 'ras_alloc()' internally and will return 'NULL'
  * on allocation errors.

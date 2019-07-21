@@ -39,6 +39,7 @@ SRC += @SRC@
 SRC += @DEPS@
 
 ## Source headers
+HEADERS += $(wildcard $(CWD)/include/*.h)
 HEADERS += $(wildcard $(CWD)/include/$(LIBRARY_NAME)/*.h)
 HEADERS += $(wildcard $(CWD)/include/$(LIBRARY_NAME)/*/*.h)
 HEADERS += $(wildcard $(CWD)/include/$(LIBRARY_NAME)/*/*/*.h)
