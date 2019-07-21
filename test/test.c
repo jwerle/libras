@@ -50,7 +50,6 @@ read(struct ras_request_s *request) {
     }
   }
 
-  printf("diff=%d\n", diff);
   if (0 == diff) {
     ok("read() from written buffer");
   }
