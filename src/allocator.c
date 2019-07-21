@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "ras/allocator.h"
+#include <stdlib.h>
 
 #ifndef RAS_ALLOCATOR_ALLOC
 #define RAS_ALLOCATOR_ALLOC 0
@@ -61,9 +61,9 @@ ras_free(void *ptr) {
     return;
   } else if (0 != dealloc) {
     (void) stats.free++;
-    return dealloc(ptr);
+    dealloc(ptr);
   } else {
     (void) stats.free++;
-    return free(ptr);
+    free(ptr);
   }
 }
