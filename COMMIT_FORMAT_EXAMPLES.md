@@ -7,17 +7,17 @@ A `chore` type is a task not directly tied to a feature, fix, or test. It is
 often work that requires no change to production code.
 
 ```
-chore(scripts): Moved extraneous scripts into scripts/ directory
+chore(scripts/): Moved extraneous scripts into scripts/ directory
 ```
 
 ## Documentation
 
 A `docs` type is a task that directly effects documentation that is
-constructed manually, programmitcally, or through a third-party. This
+constructed manually, programmatically, or through a third-party. This
 can include typos, additions, deletions, and examples.
 
 ```
-docs(context.c): Describe new context API
+docs(allocator.h): Document prototypes
 ```
 
 ## Features
@@ -26,17 +26,17 @@ A `feat` type is a task that introduces a new feature. The new feature
 may introduce a breaking change to production code.
 
 ```
-feat(texture.c): Introduce new 3D texture API
+feat(storage.c): Introduce new random access storage operation
 ```
 
 ## Fixes/bugs
 
 A `fix` type is a task that addresses a bug in production code, build
-scripts, compilation steps, or anything that directly or indiretly breaks or
+scripts, compilation steps, or anything that directly or indirectly breaks or
 impacts production.
 
 ```
-fix(buffer.c): Fix the freeing of buffer resources
+fix(request.c): Fix double free
 ```
 
 ## Refactoring
@@ -55,7 +55,7 @@ semicolons, converting tabs to spaces, or removing extra newlines. There
 should not be any code changes.
 
 ```
-style(ara.h): Convert tabs to spaces
+style(ras.h): Convert tabs to spaces
 ```
 
 ## Tests
@@ -65,5 +65,5 @@ This may include adding a new or missing test, refactoring existing
 tests, or removing useless tests. There should not be any code changes.
 
 ```
-test(gl.c): Ensure OpenGL APIs are exposed
+test(test.c): Enhance code path coverage
 ```

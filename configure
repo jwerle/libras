@@ -498,22 +498,22 @@ function configure {
   echo
   info "Checking for required C functions"
   if check_posix_memalign; then
-    cflag '-D ARA_HAVE_POSIX_MEMALIGN'
+    cflag '-D RAS_HAVE_POSIX_MEMALIGN'
   else
     warn "Missing posix_memalign()"
   fi
 
   if check_memalign; then
-    cflag '-D ARA_HAVE_MEMALIGN'
+    cflag '-D RAS_HAVE_MEMALIGN'
   else
     warn "Missing memalign()"
   fi
 
   info "Checking for deprecated system headers"
   if check_header 'malloc.h'; then
-    cflag '-D ARA_HAVE_MALLOC_H'
+    cflag '-D RAS_HAVE_MALLOC_H'
   elif check_header 'malloc/malloc.h'; then
-    cflag '-D ARA_HAVE_MALLOC_MALLOC_H'
+    cflag '-D RAS_HAVE_MALLOC_MALLOC_H'
   fi
 
   echo
@@ -565,7 +565,7 @@ function main {
 
   if (( $DEBUG )); then
     CONFIGURE_FLAGS+="--debug=true"
-    cflag '-D ARA_DEBUG'
+    cflag '-D RAS_DEBUG'
     cflag '-g'
   else
     CONFIGURE_FLAGS+="--debug=false"

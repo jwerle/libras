@@ -170,7 +170,7 @@ ras_storage_read_after(
   unsigned int err,
   void *value,
   unsigned long int size
-  ) {
+) {
   if (0 != request) {
     if (0 != value && value != request->data) {
       ras_free(value);

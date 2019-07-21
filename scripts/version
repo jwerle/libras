@@ -16,14 +16,14 @@ fi
 test "$revision" || revision=$(cd "$1" &&
   git log -1 --pretty=format:"git-%cd-%h" --date=short 2> /dev/null)
 
-# Snapshots from gitweb are in a directory called libara-hhhhhhh or
-# libara-HEAD-hhhhhhh.
+# Snapshots from gitweb are in a directory called libras-hhhhhhh or
+# libras-HEAD-hhhhhhh.
 if [ -z "$revision" ]; then
   srcdir=$(cd "$1" && pwd)
   case "$srcdir" in
-    */libara-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f])
+    */libras-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f])
       git_hash="${srcdir##*-}";;
-    */libara-HEAD-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f])
+    */libras-HEAD-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f])
       git_hash="${srcdir##*-}";;
   esac
 fi
