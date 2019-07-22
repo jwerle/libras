@@ -6,6 +6,7 @@
     "example": "example",
     "test": "test"
   },
+  "repo": "jwerle/libras",
   "src": [
     "include/ras/allocator.h",
     "include/ras/platform.h",
