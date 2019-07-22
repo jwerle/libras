@@ -108,7 +108,7 @@ typedef void (ras_storage_destroy_callback_t)(
   ras_storage_request_callback_t *stat;           \
   ras_storage_request_callback_t *close;          \
   ras_storage_request_callback_t *destroy;        \
-  const void *data;
+  void *data;
 
 /**
  * Represents the initial configurable state for a random access storage
@@ -138,7 +138,7 @@ struct ras_storage_options_s {
   struct ras_request_s last_request;                           \
   struct ras_request_s *queue[RAS_STORAGE_MAX_REQUEST_QUEUE];  \
   struct ras_storage_options_s options;                        \
-  const void *data;
+  void *data;
 
 /**
  * Represents the state for a random access storage context.

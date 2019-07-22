@@ -98,14 +98,14 @@ ras_request_alloc();
 RAS_EXPORT int
 ras_request_init(
   struct ras_request_s *request,
-  struct ras_request_options_s options);
+  const struct ras_request_options_s options);
 
 /**
  * Allocates and initializes a pointer to `struct ras_request_s`. Returns
  * `NULL` on error and `errno` is set to an error code found in `errno.h`.
  */
 RAS_EXPORT struct ras_request_s *
-ras_request_new(struct ras_request_options_s options);
+ras_request_new(const struct ras_request_options_s options);
 
 /**
  * Frees a pointer to `struct ras_request_s`.
