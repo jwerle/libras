@@ -1,5 +1,5 @@
 {
-  "name": "@jwerle/libras",
+  "name": "ras",
   "version": "0.0.1",
   "description": "A C99 library for creating random access storage interfaces.",
   "directories": {
