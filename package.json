@@ -1,0 +1,22 @@
+{
+  "name": "@jwerle/libras",
+  "version": "0.0.1",
+  "description": "A C99 library for creating random access storage interfaces.",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwerle/libras.git"
+  },
+  "author": "Joseph Werle <joseph.werle@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jwerle/libras/issues"
+  },
+  "homepage": "https://github.com/jwerle/libras#readme"
+}
