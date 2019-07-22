@@ -1,6 +1,6 @@
 {
   "name": "ras",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "A C99 library for creating random access storage interfaces.",
   "directories": {
     "example": "example",
@@ -14,15 +14,12 @@
     "include/ras/storage.h",
     "include/ras/version.h",
     "include/ras/ras.h",
-
     "src/allocator.c",
     "src/request.c",
     "src/require.h",
     "src/storage.c",
     "src/version.c",
-
     "mk/brief.mk",
-
     "Makefile.in",
     "configure",
     "README.md",
