@@ -17,10 +17,10 @@ run_request(
   if (storage->queued > 0) {
     ras_storage_queue_push(storage, request);
   } else {
-    ras_request_run(request);
+    return ras_request_run(request);
   }
 
-  return request->err;
+  return - (int) request->err;
 }
 
 static int
@@ -31,10 +31,11 @@ queue_and_run(
   ras_storage_queue_push(storage, request);
 
   if (0 == storage->pending) {
-    ras_request_run(request);
+    return -ras_request_run(request);
+  } else {
+    return - (int) request->err;
   }
 
-  return request->err;
 }
 
 struct ras_storage_s *
@@ -65,11 +66,11 @@ ras_storage_new(struct ras_storage_options_s options) {
   struct ras_storage_s *storage = ras_storage_alloc();
   if (ras_storage_init(storage, options) < 0) {
     ras_free(storage);
-    return 0;
+    storage = 0;
   } else {
     storage->alloc = 1;
-    return storage;
   }
+  return storage;
 }
 
 void
@@ -86,8 +87,10 @@ ras_storage_destroy_after(
   void *value,
   unsigned long int size
 ) {
-  ras_storage_free(request->storage);
-  request->storage = 0;
+  if (0 != request->storage) {
+    ras_storage_free(request->storage);
+    request->storage = 0;
+  }
   return 0;
 }
 
