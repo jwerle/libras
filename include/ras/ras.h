@@ -1,11 +1,11 @@
 #ifndef RAS_H
 #define RAS_H
 
-#include "ras/allocator.h"
-#include "ras/platform.h"
-#include "ras/request.h"
-#include "ras/storage.h"
-#include "ras/version.h"
+#include "allocator.h"
+#include "platform.h"
+#include "request.h"
+#include "storage.h"
+#include "version.h"
 
 /**
  * The `ras_storage_t` (`struct ras_storage_s`) type represents

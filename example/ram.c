@@ -1,9 +1,9 @@
+#include <ras/ras.h>
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
 #include <math.h>
-#include <ras.h>
 
 #ifndef RAS_RAM_MAX_BUFFERS
 #define RAS_RAM_MAX_BUFFERS 1024
