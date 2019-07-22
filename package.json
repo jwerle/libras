@@ -8,17 +8,17 @@
   },
   "repo": "jwerle/libras",
   "src": [
-    "include/ras/allocator.h",
-    "include/ras/platform.h",
-    "include/ras/ras.h",
-    "include/ras/request.h",
-    "include/ras/storage.h",
-    "include/ras/version.h",
-    "allocator.c",
-    "request.c",
-    "require.h",
-    "storage.c",
-    "version.c"
+    "./include/ras/allocator.h",
+    "./include/ras/platform.h",
+    "./include/ras/ras.h",
+    "./include/ras/request.h",
+    "./include/ras/storage.h",
+    "./include/ras/version.h",
+    "./src/allocator.c",
+    "./src/request.c",
+    "./src/require.h",
+    "./src/storage.c",
+    "./src/version.c"
   ],
   "scripts": {
     "test": "make test"
