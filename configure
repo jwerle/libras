@@ -61,12 +61,13 @@ declare -a DEPS=(
 
 ## Source files
 declare -a SRC=(
+  $(ls *.c)
   $(ls src/*.c)
 )
 
 ## Required system headers
 declare -a HEADER_DEPENDENCIES=(
-  'stdint.h' 'stdio.h' 'stdlib.h' 'string.h'
+  'errno.h' 'stdio.h' 'stdlib.h' 'string.h'
 )
 
 case $OS in

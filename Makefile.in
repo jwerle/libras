@@ -39,6 +39,7 @@ SRC += @SRC@
 SRC += @DEPS@
 
 ## Source headers
+HEADERS += $(wildcard $(CWD)/*.h)
 HEADERS += $(wildcard $(CWD)/include/*.h)
 HEADERS += $(wildcard $(CWD)/include/$(LIBRARY_NAME)/*.h)
 HEADERS += $(wildcard $(CWD)/include/$(LIBRARY_NAME)/*/*.h)
@@ -95,6 +96,7 @@ BRIEFC += CC
 
 ifneq (1,$(NO_BRIEF))
 -include mk/brief.mk
+-include brief.mk
 endif
 
 ## Builds everything
