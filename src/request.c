@@ -45,6 +45,7 @@ ras_request_init(
   require(options.storage, EINVAL);
   require(memset(request, 0, sizeof(struct ras_request_s)), EFAULT);
 
+
   request->callback = ras_request_callback;
   request->storage = options.storage;
   request->offset = options.offset;
@@ -64,15 +65,15 @@ ras_request_new(struct ras_request_options_s options) {
     ras_free(request);
     return 0;
   } else {
+    request->alloc = 1;
     return request;
   }
 }
 
 void
 ras_request_free(struct ras_request_s *request) {
-  if (0 != request) {
+  if (0 != request && 1 == request->alloc) {
     ras_free(request);
-    request = 0;
   }
 }
 
@@ -147,13 +148,12 @@ ras_request_run(struct ras_request_s *request) {
       if (1 == request->storage->opened && 0 == request->storage->needs_open) {
         return ras_request_callback(request, 0, 0, 0);
       } else {
-        request->storage->needs_open = 0;
         if (1 == request->storage->prefer_read_only) {
           request->storage->options.open_read_only(request);
         } else if (0 != request->storage->options.open) {
           request->storage->options.open(request);
         } else {
-          return ras_request_callback(request, ENOSYS, 0, 0);
+          return ras_request_callback(request, 0, 0, 0);
         }
       }
       break;
@@ -198,7 +198,9 @@ ras_request_dequeue(
   if (err > 0) {
     if (RAS_REQUEST_OPEN == request->type) {
       for (int i = 0; i < request->storage->queued; ++i) {
-        request->storage->queue[i]->err = err;
+        if (0 != request->storage->queue[i]) {
+          request->storage->queue[i]->err = err;
+        }
       }
     }
   } else {
@@ -206,12 +208,14 @@ ras_request_dequeue(
       case RAS_REQUEST_OPEN:
         if (0 == request->storage->opened) {
           request->storage->opened = 1;
+          request->storage->needs_open = 0;
           // @TODO(jwerle): HOOK(open)
         }
         break;
 
       case RAS_REQUEST_CLOSE:
         if (0 == request->storage->closed) {
+          request->storage->opened = 0;
           request->storage->closed = 1;
           // @TODO(jwerle): HOOK(close)
         }
@@ -249,6 +253,10 @@ ras_request_dequeue(
         ras_request_free(ras_storage_queue_shift(request->storage));
       }
     }
+  }
+
+  if ((int) request->storage->pending < 0) {
+    request->storage->pending = 0;
   }
 
   return 0;
@@ -311,16 +319,19 @@ ras_request_callback(
     }
   }
 
-  for (int i = 0; i < request->storage->queued; ++i) {
-    if (request == request->storage->queue[i]) {
-      ras_request_free(request);
-      request->storage->queue[i] = 0;
-      break;
-    }
-  }
+  unsigned int queued = request->storage->queued;
+  struct ras_request_s **queue = request->storage->queue;
 
   if (0 != request->after) {
     request->after(request, err, value, size);
+  }
+
+  for (int i = 0; i < queued; ++i) {
+    if (request == (*queue + i)) {
+      ras_request_free(request);
+      queue[i] = 0;
+      break;
+    }
   }
 
   return err;

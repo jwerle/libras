@@ -67,20 +67,20 @@ ras_storage_new(struct ras_storage_options_s options) {
     ras_free(storage);
     return 0;
   } else {
+    storage->alloc = 1;
     return storage;
   }
 }
 
 void
 ras_storage_free(struct ras_storage_s *storage) {
-  if (0 != storage) {
+  if (0 != storage && 1 == storage->alloc) {
     ras_free(storage);
-    storage = 0;
   }
 }
 
 static int
-destroy_storage(
+ras_storage_destroy_after(
   struct ras_request_s *request,
   unsigned int err,
   void *value,
@@ -102,12 +102,13 @@ ras_storage_destroy(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
-      .after = destroy_storage,
+      .after = ras_storage_destroy_after,
       .type = RAS_REQUEST_DESTROY,
       .data = 0
     });
 
   require(request, EFAULT);
+  require(0 == ras_storage_close(storage, 0), errno);
   return queue_and_run(storage, request);
 }
 
@@ -165,6 +166,7 @@ ras_storage_read_before(
   unsigned long int size
 ) {
   request->data = ras_alloc(size);
+  memset(request->data, 0, size);
   return 0;
 }
 
@@ -272,6 +274,7 @@ ras_storage_stat_before(
   unsigned long int size
 ) {
   request->data = ras_alloc(sizeof(struct ras_storage_stats_s));
+  memset(request->data, 0, size);
   return 0;
 }
 
@@ -352,7 +355,7 @@ ras_storage_delete(
       .offset = offset,
       .before = ras_storage_delete_before,
       .after = ras_storage_delete_after,
-      .type = RAS_REQUEST_WRITE,
+      .type = RAS_REQUEST_DELETE,
       .size = size,
     });
 
@@ -389,6 +392,7 @@ ras_storage_queue_push(
   require(storage, EFAULT);
   require(request, EFAULT);
   require(storage == request->storage, EINVAL);
+
   // push
   storage->queue[storage->queued++] = request;
   request->pending = 1;
