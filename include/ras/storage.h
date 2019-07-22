@@ -123,10 +123,11 @@ struct ras_storage_options_s {
  * extending structures that ensure correct memory layout.
  */
 #define RAS_STORAGE_FIELDS                                     \
+  unsigned int alloc:1;                                        \
   unsigned int opened:1;                                       \
   unsigned int closed:1;                                       \
-  unsigned int queued:8;                                       \
-  unsigned int pending:8;                                      \
+  unsigned int queued;                                         \
+  unsigned int pending;                                        \
   unsigned int readable:1;                                     \
   unsigned int statable:1;                                     \
   unsigned int writable:1;                                     \

@@ -59,6 +59,7 @@ struct ras_request_options_s {
  * extending structures that ensure correct memory layout.
  */
 #define RAS_REQUEST_FIELDS          \
+  unsigned int alloc:1;             \
   unsigned int err;                 \
   unsigned int offset;              \
   unsigned long int size;           \
