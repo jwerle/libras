@@ -16,6 +16,7 @@ LIBS = $(wildcard ../build/lib/*.a)
 CFLAGS += -I ../build/include
 CFLAGS += -I ../deps
 CFLAGS += -L $(BUILD_LIBRARY_PATH)
+CFLAGS += -l m
 
 ## we need to set the LD_LIBRARY_PATH environment variable
 ## so our executables can load the built library at runtime
