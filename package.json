@@ -6,6 +6,19 @@
     "example": "example",
     "test": "test"
   },
+  "src": [
+    "include/ras/allocator.h",
+    "include/ras/platform.h",
+    "include/ras/ras.h",
+    "include/ras/request.h",
+    "include/ras/storage.h",
+    "include/ras/version.h",
+    "allocator.c",
+    "request.c",
+    "require.h",
+    "storage.c",
+    "version.c"
+  ],
   "scripts": {
     "test": "make test"
   },
