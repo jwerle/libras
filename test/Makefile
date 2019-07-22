@@ -14,6 +14,7 @@ CFLAGS += -I ../build/include
 CFLAGS += -I ../deps
 CFLAGS += -L $(BUILD_LIBRARY_PATH)
 CFLAGS += -l ras
+CFLAGS += -g
 
 ifeq (Darwin, $(shell uname))
   CFLAGS += -framework Foundation
