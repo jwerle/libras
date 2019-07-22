@@ -17,6 +17,7 @@ CFLAGS += -I ../build/include
 CFLAGS += -I ../deps
 CFLAGS += -L $(BUILD_LIBRARY_PATH)
 CFLAGS += -l m
+CFLAGS += -g
 
 ## we need to set the LD_LIBRARY_PATH environment variable
 ## so our executables can load the built library at runtime
@@ -41,7 +42,7 @@ endif
 default: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	@$(CC) $(OBJECTS) $(LIBS) $(CFLAGS) -o $@
+	@$(CC) $(OBJECTS) $(wildcard ../src/*.c) $(CFLAGS) -o $@
 
 %.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
