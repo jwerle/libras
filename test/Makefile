@@ -10,6 +10,8 @@ SOURCES += $(wildcard *.c)
 TARGETS = $(SOURCES:.c=)
 
 ## test compiler flags
+CFLAGS += -Wall
+CFLAGS += -Werror
 CFLAGS += -I ../build/include
 CFLAGS += -I ../deps
 CFLAGS += -L $(BUILD_LIBRARY_PATH)
