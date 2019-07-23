@@ -12,6 +12,13 @@ enum {
 };
 
 static int
+ras_request_dequeue(
+  struct ras_request_s *request,
+  struct ras_storage_s *storage,
+  enum ras_request_type type,
+  unsigned int err);
+
+static int
 readystate(struct ras_request_s *request) {
   require(request, EFAULT);
   require(request->storage, EFAULT);
@@ -80,6 +87,7 @@ void
 ras_request_free(struct ras_request_s *request) {
   if (0 != request && 1 == request->alloc) {
     request->alloc = 0;
+    memset(request, 0, sizeof(*request));
     ras_free(request);
     request = 0;
   }
@@ -197,17 +205,19 @@ ras_request_run(struct ras_request_s *request) {
 int
 ras_request_dequeue(
   struct ras_request_s *request,
+  struct ras_storage_s *storage,
+  enum ras_request_type type,
   unsigned int err
 ) {
+  unsigned int needs_free = 0;
   require(request, EFAULT);
   require(request->storage, EFAULT);
-
-  struct ras_storage_s *storage = request->storage;
-  enum ras_request_type type = request->type;
 
   // maybe open error?
   if (err > 0) {
     if (RAS_REQUEST_OPEN == type) {
+      storage->needs_open = 1;
+      storage->opened = 0;
       for (int i = 0; i < storage->queued; ++i) {
         if (0 != storage->queue[i]) {
           storage->queue[i]->err = err;
@@ -248,13 +258,14 @@ ras_request_dequeue(
   struct ras_request_s *head = storage->queue[0];
   unsigned int queued = storage->queued;
   if (queued > 0 && head == request) {
-    ras_request_free(ras_storage_queue_shift(storage));
+    ras_storage_queue_shift(storage);
+    needs_free = 1;
     request = 0;
     head = 0;
   }
 
   // drain queue
-  if (0 == --storage->pending) {
+  if (0 == (int) --storage->pending) {
     while (storage->queued > 0) {
       if (0 == storage->queue[0]) {
         ras_storage_queue_shift(storage);
@@ -272,7 +283,11 @@ ras_request_dequeue(
     }
   }
 
-  return 0;
+  if ((int) storage->pending < 0) {
+    storage->pending = 0;
+  }
+
+  return needs_free;
 }
 
 int
@@ -290,7 +305,6 @@ ras_request_callback(
   struct ras_storage_s *storage = request->storage;
   ras_request_callback_t *after = request->after;
 
-  unsigned int freed = storage->queued > 0 && request == storage->queue[0];
   unsigned int type = request->type;
   void *done = request->done;
 
@@ -298,15 +312,7 @@ ras_request_callback(
   memcpy(&local, request, sizeof(local));
   local.alloc = 0;
 
-  int rc = ras_request_dequeue(request, err);
-
-  if (0 != rc) {
-    return rc;
-  }
-
-  if (1 == freed) {
-    request = &local;
-  }
+  int rc = ras_request_dequeue(request, storage, type, err);
 
   if (0 != done) {
     switch (type) {
@@ -344,20 +350,12 @@ ras_request_callback(
     }
   }
 
-  unsigned int queued = storage->queued;
-  struct ras_request_s **queue = storage->queue;
-
   if (0 != after) {
     after(request, err, value, size);
   }
 
-  for (int i = 0; i < queued; ++i) {
-    if (0 == freed && 0 != request && 0 != (*queue + i) && request == (*queue + i)) {
-      ras_request_free(request);
-      queue[i] = 0;
-      request = 0;
-      break;
-    }
+  if (1 == rc) {
+    ras_request_free(request);
   }
 
   return err;

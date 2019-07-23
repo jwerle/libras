@@ -50,14 +50,17 @@ ras_storage_init(
 ) {
   require(storage, EFAULT);
   require(memset(storage, 0, sizeof(struct ras_storage_s)), EFAULT);
-  require(memcpy(&storage->options, &options, sizeof(struct ras_storage_options_s)), EFAULT);
-  storage->data = options.data;
-  storage->needs_open = 1;
-  storage->readable = 0 != options.read;
-  storage->writable = 0 != options.write;
-  storage->statable = 0 != options.stat;
-  storage->deletable = 0 != options.del;
+  require(
+    memcpy(&storage->options, &options, sizeof(struct ras_storage_options_s)),
+    EFAULT);
+
   storage->prefer_read_only = 0 != options.open_read_only;
+  storage->needs_open = 1;
+  storage->deletable = 0 != options.del;
+  storage->readable = 0 != options.read;
+  storage->statable = 0 != options.stat;
+  storage->writable = 0 != options.write;
+  storage->data = options.data;
   return 0;
 }
 
@@ -384,6 +387,9 @@ ras_storage_queue_shift(struct ras_storage_s *storage) {
   }
 
   (void) --storage->queued;
+  if (storage->queued < 0) {
+    storage->queued = 0;
+  }
   return head;
 }
 
@@ -396,6 +402,9 @@ ras_storage_queue_push(
   require(request, EFAULT);
   require(storage == request->storage, EINVAL);
 
+  if ((int) storage->queued < 0) {
+    storage->queued = 0;
+  }
   // push
   storage->queue[storage->queued++] = request;
   request->pending = 1;
