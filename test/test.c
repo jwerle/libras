@@ -1,6 +1,7 @@
 #include <ras/allocator.h>
 #include <ras/storage.h>
 #include <ras/version.h>
+#include <assert.h>
 #include <stdio.h>
 #include <ok/ok.h>
 
@@ -68,6 +69,23 @@ write(struct ras_request_s *request) {
 }
 
 static void
+delete(struct ras_request_s *request) {
+  ok("delete()");
+  for (int i = 0; i < request->size; ++i) {
+    memory[request->offset + i] = 0;
+  }
+  request->callback(request, 0, 0, request->size);
+}
+
+static void
+stat(struct ras_request_s *request) {
+  ok("stat()");
+  struct ras_storage_stats_s *stats = request->data;
+  stats->size = sizeof(memory);
+  request->callback(request, 0, 0, request->size);
+}
+
+static void
 onopen(struct ras_storage_s *storage, int err) {
   ok("onopen()");
 }
@@ -83,6 +101,23 @@ ondestroy(struct ras_storage_s *storage, int err) {
 }
 
 static void
+ondelete(struct ras_storage_s *storage, int err) {
+  ok("ondelete()");
+  for (int i = 0; i < storage->last_request.size; ++i) {
+    assert(0 == memory[i + storage->last_request.offset]);
+  }
+}
+
+static void
+onstat(
+  struct ras_storage_s *storage,
+  int err,
+  struct ras_storage_stats_s *stats
+) {
+  ok("ondelete()");
+}
+
+static void
 onread(
   struct ras_storage_s *storage,
   int err,
@@ -92,7 +127,8 @@ onread(
   ok("onread()");
   unsigned char *data = buffer;
   for (int i = 0; i < size; ++i) {
-    printf("%x ", (unsigned char) data[i]);
+    assert(memory[i + storage->last_request.offset] == data[i]);
+    printf("%x ", data[i]);
   }
   printf("\n");
 }
@@ -103,6 +139,10 @@ onwrite(
   int err
 ) {
   ok("onwrite()");
+  unsigned char *data = storage->last_request.data;
+  for (int i = 0; i < storage->last_request.size; ++i) {
+    assert(data[i] == memory[i + storage->last_request.offset]);
+  }
 }
 
 int
@@ -114,7 +154,9 @@ main(void) {
     (struct ras_storage_options_s) {
       .open = open,
       .close = close,
+      .del = delete,
       .destroy = destroy,
+      .stat = stat,
       .read = read,
       .write = write,
     });
@@ -133,6 +175,14 @@ main(void) {
 
   if (0 == ras_storage_read(storage, 15, 4, onread)) {
     ok("ras_storage_read()");
+  }
+
+  if (0 == ras_storage_delete(storage, 15, 4, ondelete)) {
+    ok("ras_storage_delete()");
+  }
+
+  if (0 == ras_storage_stat(storage, onstat)) {
+    ok("ras_storage_stat()");
   }
 
   if (0 == ras_storage_close(storage, onclose)) {
