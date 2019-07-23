@@ -70,7 +70,8 @@ struct ras_request_options_s {
   ras_request_callback_t *callback; \
   ras_request_callback_t *after;    \
   void *done;                       \
-  void *data;
+  void *data;                       \
+  void *shared;
 
 /**
  * Represents the state for a random access storage operation context.
@@ -129,15 +130,5 @@ ras_request_callback(
   unsigned int err,
   void *value,
   unsigned long int size);
-
-/**
- * Dequeues the current pending requests in the context
- * of a operation request associated with a random access
- * storage context.
- */
-RAS_EXPORT int
-ras_request_dequeue(
-  struct ras_request_s *request,
-  unsigned int err);
 
 #endif
