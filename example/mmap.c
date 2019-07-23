@@ -37,13 +37,14 @@ mmap_open(ras_request_t *request) {
 
 static void
 mmap_close(ras_request_t *request) {
+  mmap_context_t *context = request->storage->data;
+  close(context->fd);
+  context->fd = 0;
+  request->callback(request, 0, 0, 0);
 }
 
 static void
 mmap_destroy(ras_request_t *request) {
-  mmap_context_t *context = request->storage->data;
-  close(context->fd);
-  context->fd = 0;
   request->callback(request, 0, 0, 0);
 }
 
@@ -217,6 +218,8 @@ ondestroy(ras_storage_t *storage, int err) {
   printf("ondestroy(err=[%d: %s])\n", err, strerror(err));
 }
 
+// create a blob with:
+// $ dd if=/dev/zero of=data bs=64 count=1
 int
 main(int argc, const char **argv) {
   const char *filename = argv[1];
@@ -240,6 +243,7 @@ main(int argc, const char **argv) {
       .open = mmap_open,
       .write = mmap_write,
       .read = mmap_read,
+      .close = mmap_close,
       .del = mmap_del,
       .destroy = mmap_destroy
     });

@@ -56,3 +56,4 @@ test/test
 example/ram
 example/thread
 example/mmap
+data
