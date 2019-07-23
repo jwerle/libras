@@ -6,7 +6,7 @@ BUILD_LIBRARY_PATH = $(CWD)/../build/lib
 DEPS += $(wildcard ../deps/*/*.c)
 
 ## source files
-TARGET = ram
+TARGET = ram thread
 SOURCE += $(wildcard *.c) $(DEPS)
 OBJECTS = $(SOURCE:.c=.o)
 
@@ -16,6 +16,7 @@ LIBS = $(wildcard ../build/lib/*.a)
 CFLAGS += -I ../build/include
 CFLAGS += -I ../deps
 CFLAGS += -L $(BUILD_LIBRARY_PATH)
+CFLAGS += -l pthread
 CFLAGS += -l m
 CFLAGS += -g
 
@@ -35,17 +36,17 @@ BRIEFC += LN
 BRIEFC += AR
 BRIEFC += CC
 
--include ../mk/brief.mk
+#-include ../mk/brief.mk
 endif
 
 .PHONY: default
 default: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	@$(CC) $(OBJECTS) $(wildcard ../src/*.c) $(CFLAGS) -o $@
+	$(CC) $@.o $(wildcard ../src/*.c) $(CFLAGS) -o $@
 
 %.o: %.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean
 clean:
