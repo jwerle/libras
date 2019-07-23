@@ -6,7 +6,7 @@ BUILD_LIBRARY_PATH = $(CWD)/../build/lib
 DEPS += $(wildcard ../deps/*/*.c)
 
 ## source files
-TARGET = ram thread
+TARGET = ram thread mmap
 SOURCE += $(wildcard *.c) $(DEPS)
 OBJECTS = $(SOURCE:.c=.o)
 
