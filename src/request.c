@@ -104,20 +104,19 @@ ras_request_run(struct ras_request_s *request) {
 
   request->storage->pending++;
 
+  if (0 != request->before) {
+    request->before(request, request->err, request->data, request->size);
+  }
+
   memcpy(
     &(request->storage->last_request),
     request,
     sizeof(struct ras_request_s));
 
-  request->storage->last_request.data = 0;
   request->storage->last_request.done = 0;
   request->storage->last_request.after = 0;
   request->storage->last_request.before = 0;
   request->storage->last_request.callback = 0;
-
-  if (0 != request->before) {
-    request->before(request, request->err, request->data, request->size);
-  }
 
   switch (request->type) {
     case RAS_REQUEST_READ:
