@@ -17,6 +17,7 @@ CFLAGS += -I ../build/include
 CFLAGS += -I ../deps
 CFLAGS += -L $(BUILD_LIBRARY_PATH)
 CFLAGS += -l pthread
+CFLAGS += -l rt
 CFLAGS += -l m
 CFLAGS += -g
 

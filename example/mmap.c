@@ -10,6 +10,7 @@
 typedef struct mmap_context_s mmap_context_t;
 struct mmap_context_s {
   int fd;
+  int size;
   int page_size;
   const char *filename;
 };
@@ -27,7 +28,10 @@ mmap_page(int index, ras_request_t *request, mmap_context_t *context, int prot, 
 static void
 mmap_open(ras_request_t *request) {
   mmap_context_t *context = request->storage->data;
-  context->fd = open(context->filename, O_CREAT | O_SYNC | O_RDWR, S_IRUSR | S_IWUSR);
+  context->fd = shm_open(context->filename, O_CREAT | O_SYNC | O_RDWR, S_IRUSR | S_IWUSR);
+  unsigned char buffer[64] = { 0 };
+  // write zeros
+  write(context->fd, buffer, 64);
   if (context->fd < 0) {
     request->callback(request, errno, 0, 0);
   } else {
@@ -45,6 +49,8 @@ mmap_close(ras_request_t *request) {
 
 static void
 mmap_destroy(ras_request_t *request) {
+  mmap_context_t *context = request->storage->data;
+  shm_unlink(context->filename);
   request->callback(request, 0, 0, 0);
 }
 
@@ -218,24 +224,15 @@ ondestroy(ras_storage_t *storage, int err) {
   printf("ondestroy(err=[%d: %s])\n", err, strerror(err));
 }
 
-// create a blob with:
 // $ dd if=/dev/zero of=data bs=64 count=1
 int
 main(int argc, const char **argv) {
-  const char *filename = argv[1];
-
-  if (0 == filename) {
-    fprintf(stderr, "error: Missing filename\n");
-    return -1;
-  }
-
-  printf("file: %s\n", filename);
-
   mmap_context_t context = { 0 };
   ras_storage_t storage = { 0 };
 
   context.page_size = getpagesize();
-  context.filename = filename;
+  context.filename = "data";
+  context.size = 64;
 
   ras_storage_init(&storage,
     (ras_storage_options_t) {
