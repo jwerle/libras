@@ -1,6 +1,6 @@
 {
   "name": "ras",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "clib": true,
   "description": "A C99 library for creating random access storage interfaces.",
   "directories": {
