@@ -357,5 +357,5 @@ ras_request_callback(
     ras_request_free(request);
   }
 
-  return err;
+  return - (int) err;
 }
