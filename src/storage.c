@@ -103,6 +103,7 @@ ras_storage_destroy(
   ras_storage_destroy_callback_t *callback
 ) {
   require(storage, EFAULT);
+  require(0 == ras_storage_close(storage, 0), errno);
 
   struct ras_request_s *request = ras_request_new(
     (struct ras_request_options_s) {
@@ -114,7 +115,6 @@ ras_storage_destroy(
     });
 
   require(request, EFAULT);
-  require(0 == ras_storage_close(storage, 0), errno);
   return queue_and_run(storage, request);
 }
 
