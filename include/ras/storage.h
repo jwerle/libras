@@ -152,7 +152,8 @@ struct ras_storage_s {
  * extending structures that ensure correct memory layout.
  */
 #define RAS_STORAGE_STATS_FIELDS \
-  unsigned long int size;
+  unsigned long int size;        \
+  void *extended;
 
 /**
  * Represents the state for random access storage stats.
