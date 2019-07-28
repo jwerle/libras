@@ -213,6 +213,7 @@ RAS_EXPORT int
 ras_storage_open_shared(
   struct ras_storage_s *storage,
   ras_storage_open_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared);
 
 /**
@@ -233,6 +234,7 @@ ras_storage_read_shared(
   unsigned long int offset,
   unsigned long int size,
   ras_storage_read_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared);
 
 /**
@@ -255,6 +257,7 @@ ras_storage_write_shared(
   unsigned long int size,
   const void *buffer,
   ras_storage_write_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared);
 
 /**
@@ -276,6 +279,7 @@ ras_storage_delete_shared(
   unsigned long int offset,
   unsigned long int size,
   ras_storage_delete_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared);
 
 /**
@@ -292,6 +296,7 @@ RAS_EXPORT int
 ras_storage_stat_shared(
   struct ras_storage_s *storage,
   ras_storage_stat_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared);
 
 /**
@@ -308,6 +313,7 @@ RAS_EXPORT int
 ras_storage_close_shared(
   struct ras_storage_s *storage,
   ras_storage_close_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared);
 
 /**
@@ -326,6 +332,7 @@ RAS_EXPORT int
 ras_storage_destroy_shared(
   struct ras_storage_s *storage,
   ras_storage_destroy_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared);
 
 /**

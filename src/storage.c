@@ -105,13 +105,14 @@ ras_storage_destroy(
   struct ras_storage_s *storage,
   ras_storage_destroy_callback_t *callback
 ) {
-  return ras_storage_destroy_shared(storage, callback, 0);
+  return ras_storage_destroy_shared(storage, callback, 0, 0);
 }
 
 int
 ras_storage_destroy_shared(
   struct ras_storage_s *storage,
   ras_storage_destroy_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared
 ) {
   require(storage, EFAULT);
@@ -124,6 +125,7 @@ ras_storage_destroy_shared(
       .shared = shared,
       .after = ras_storage_destroy_after,
       .type = RAS_REQUEST_DESTROY,
+      .hook = hook,
       .data = 0
     });
 
@@ -150,13 +152,14 @@ ras_storage_open(
   struct ras_storage_s *storage,
   ras_storage_open_callback_t *callback
 ) {
-  return ras_storage_open_shared(storage, callback, 0);
+  return ras_storage_open_shared(storage, callback, 0, 0);
 }
 
 int
 ras_storage_open_shared(
   struct ras_storage_s *storage,
   ras_storage_open_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared
 ) {
   require(storage, EFAULT);
@@ -175,6 +178,7 @@ ras_storage_open_shared(
       .storage = storage,
       .shared = shared,
       .after = ras_storage_open_after,
+      .hook = hook,
       .type = RAS_REQUEST_OPEN,
       .data = 0,
     });
@@ -203,13 +207,14 @@ ras_storage_close(
   struct ras_storage_s *storage,
   ras_storage_close_callback_t *callback
 ) {
-  return ras_storage_close_shared(storage, callback, 0);
+  return ras_storage_close_shared(storage, callback, 0, 0);
 }
 
 int
 ras_storage_close_shared(
   struct ras_storage_s *storage,
   ras_storage_close_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared
 ) {
   require(storage, EFAULT);
@@ -220,6 +225,7 @@ ras_storage_close_shared(
       .storage = storage,
       .shared = shared,
       .after = ras_storage_close_after,
+      .hook = hook,
       .type = RAS_REQUEST_CLOSE,
       .data = 0,
     });
@@ -269,7 +275,7 @@ ras_storage_read(
   unsigned long int size,
   ras_storage_read_callback_t *callback
 ) {
-  return ras_storage_read_shared(storage, offset, size, callback, 0);
+  return ras_storage_read_shared(storage, offset, size, callback, 0, 0);
 }
 
 int
@@ -278,6 +284,7 @@ ras_storage_read_shared(
   unsigned long int offset,
   unsigned long int size,
   ras_storage_read_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared
 ) {
   require(storage, EFAULT);
@@ -290,6 +297,7 @@ ras_storage_read_shared(
       .offset = offset,
       .before = ras_storage_read_before,
       .after = ras_storage_read_after,
+      .hook = hook,
       .type = RAS_REQUEST_READ,
       .size = size,
       .data = 0,
@@ -330,7 +338,7 @@ ras_storage_write(
   const void *buffer,
   ras_storage_write_callback_t *callback
 ) {
-  return ras_storage_write_shared(storage, offset, size, buffer, callback, 0);
+  return ras_storage_write_shared(storage, offset, size, buffer, callback, 0, 0);
 }
 
 int
@@ -340,6 +348,7 @@ ras_storage_write_shared(
   unsigned long int size,
   const void *buffer,
   ras_storage_write_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared
 ) {
   require(storage, EFAULT);
@@ -352,6 +361,7 @@ ras_storage_write_shared(
       .offset = offset,
       .before = ras_storage_write_before,
       .after = ras_storage_write_after,
+      .hook = hook,
       .type = RAS_REQUEST_WRITE,
       .size = size,
       .data = (void *) buffer,
@@ -396,13 +406,14 @@ ras_storage_stat(
   struct ras_storage_s *storage,
   ras_storage_stat_callback_t *callback
 ) {
-  return ras_storage_stat_shared(storage, callback, 0);
+  return ras_storage_stat_shared(storage, callback, 0, 0);
 }
 
 int
 ras_storage_stat_shared(
   struct ras_storage_s *storage,
   ras_storage_stat_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared
 ) {
   require(storage, EFAULT);
@@ -414,6 +425,7 @@ ras_storage_stat_shared(
       .shared = shared,
       .before = ras_storage_stat_before,
       .after = ras_storage_stat_after,
+      .hook = hook,
       .type = RAS_REQUEST_STAT,
     });
 
@@ -451,7 +463,7 @@ ras_storage_delete(
   unsigned long int size,
   ras_storage_delete_callback_t *callback
 ) {
-  return ras_storage_delete_shared(storage, offset, size, callback, 0);
+  return ras_storage_delete_shared(storage, offset, size, callback, 0, 0);
 }
 
 int
@@ -460,6 +472,7 @@ ras_storage_delete_shared(
   unsigned long int offset,
   unsigned long int size,
   ras_storage_delete_callback_t *callback,
+  ras_request_callback_t *hook,
   void *shared
 ) {
   require(storage, EFAULT);
@@ -472,6 +485,7 @@ ras_storage_delete_shared(
       .offset = offset,
       .before = ras_storage_delete_before,
       .after = ras_storage_delete_after,
+      .hook = hook,
       .type = RAS_REQUEST_DELETE,
       .size = size,
     });

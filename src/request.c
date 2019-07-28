@@ -60,6 +60,7 @@ ras_request_init(
   request->before = options.before;
   request->after = options.after;
   request->alloc = 0;
+  request->hook = options.hook;
   request->type = options.type;
   request->data = options.data;
   request->done = options.callback;
@@ -304,15 +305,16 @@ ras_request_callback(
 
   struct ras_storage_s *storage = request->storage;
   ras_request_callback_t *after = request->after;
+  ras_request_callback_t *hook = request->hook;
 
   unsigned int type = request->type;
   void *done = request->done;
 
-  struct ras_request_s local = { 0 };
-  memcpy(&local, request, sizeof(local));
-  local.alloc = 0;
-
   int rc = ras_request_dequeue(request, storage, type, err);
+
+  if (0 != hook) {
+    hook(request, err, value, size);
+  }
 
   if (0 != done) {
     switch (type) {
