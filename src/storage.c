@@ -1,5 +1,6 @@
 #include "ras/allocator.h"
 #include "ras/storage.h"
+#include "ras/emitter.h"
 #include "require.h"
 #include <string.h>
 #include <stdlib.h>
@@ -20,7 +21,7 @@ run_request(
     return ras_request_run(request);
   }
 
-  return - (int) request->err;
+  return - request->err;
 }
 
 static int
@@ -33,7 +34,7 @@ queue_and_run(
   if (0 == storage->pending) {
     return -ras_request_run(request);
   } else {
-    return - (int) request->err;
+    return - request->err;
   }
 
 }
@@ -73,6 +74,8 @@ ras_storage_new(struct ras_storage_options_s options) {
   } else {
     storage->alloc = 1;
   }
+
+  ras_emitter_init(&storage->emitter);
   return storage;
 }
 
@@ -86,7 +89,7 @@ ras_storage_free(struct ras_storage_s *storage) {
 static int
 ras_storage_destroy_after(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -118,6 +121,17 @@ ras_storage_destroy(
   return queue_and_run(storage, request);
 }
 
+static int
+ras_storage_open_after(
+  struct ras_request_s *request,
+  int err,
+  void *value,
+  unsigned long int size
+) {
+  ras_emitter_emit(&request->storage->emitter, RAS_EVENT_OPEN, 0);
+  return 0;
+}
+
 int
 ras_storage_open(
   struct ras_storage_s *storage,
@@ -137,12 +151,24 @@ ras_storage_open(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .after = ras_storage_open_after,
       .type = RAS_REQUEST_OPEN,
       .data = 0,
     });
 
   require(request, EFAULT);
   return queue_and_run(storage, request);
+}
+
+static int
+ras_storage_close_after(
+  struct ras_request_s *request,
+  int err,
+  void *value,
+  unsigned long int size
+) {
+  ras_emitter_emit(&request->storage->emitter, RAS_EVENT_CLOSE, 0);
+  return 0;
 }
 
 int
@@ -156,6 +182,7 @@ ras_storage_close(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .after = ras_storage_close_after,
       .type = RAS_REQUEST_CLOSE,
       .data = 0,
     });
@@ -167,7 +194,7 @@ ras_storage_close(
 static int
 ras_storage_read_before(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -179,7 +206,7 @@ ras_storage_read_before(
 static int
 ras_storage_read_after(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -201,7 +228,7 @@ ras_storage_read_after(
 int
 ras_storage_read(
   struct ras_storage_s *storage,
-  unsigned int offset,
+  unsigned long int offset,
   unsigned long int size,
   ras_storage_read_callback_t *callback
 ) {
@@ -226,7 +253,7 @@ ras_storage_read(
 static int
 ras_storage_write_before(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -236,7 +263,7 @@ ras_storage_write_before(
 static int
 ras_storage_write_after(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -249,7 +276,7 @@ ras_storage_write_after(
 int
 ras_storage_write(
   struct ras_storage_s *storage,
-  unsigned int offset,
+  unsigned long int offset,
   unsigned long int size,
   const void *buffer,
   ras_storage_write_callback_t *callback
@@ -275,7 +302,7 @@ ras_storage_write(
 static int
 ras_storage_stat_before(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -287,7 +314,7 @@ ras_storage_stat_before(
 static int
 ras_storage_stat_after(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -325,7 +352,7 @@ ras_storage_stat(
 static int
 ras_storage_delete_before(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -335,7 +362,7 @@ ras_storage_delete_before(
 static int
 ras_storage_delete_after(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {
@@ -348,7 +375,7 @@ ras_storage_delete_after(
 int
 ras_storage_delete(
   struct ras_storage_s *storage,
-  unsigned int offset,
+  unsigned long int offset,
   unsigned long int size,
   ras_storage_delete_callback_t *callback
 ) {

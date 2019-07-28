@@ -1,4 +1,5 @@
 #include <ras/allocator.h>
+#include <ras/emitter.h>
 #include <ras/storage.h>
 #include <ras/version.h>
 #include <assert.h>

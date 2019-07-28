@@ -1,10 +1,12 @@
 #ifndef RAS_STORAGE_H
 #define RAS_STORAGE_H
 
+#include "emitter.h"
 #include "request.h"
 #include "platform.h"
 
 // Forward declarations
+struct ras_emitter_s;
 struct ras_request_s;
 struct ras_storage_s;
 struct ras_storage_stats_s;
@@ -135,10 +137,11 @@ struct ras_storage_options_s {
   unsigned int destroyed:1;                                    \
   unsigned int needs_open:1;                                   \
   unsigned int prefer_read_only:1;                             \
+  struct ras_emitter_s emitter;                                \
   struct ras_request_s last_request;                           \
   struct ras_request_s *queue[RAS_STORAGE_MAX_REQUEST_QUEUE];  \
   struct ras_storage_options_s options;                        \
-  void *data;
+  void *data;                                                  \
 
 /**
  * Represents the state for a random access storage context.
@@ -214,7 +217,7 @@ ras_storage_open(
 RAS_EXPORT int
 ras_storage_read(
   struct ras_storage_s *storage,
-  unsigned int offset,
+  unsigned long int offset,
   unsigned long int size,
   ras_storage_read_callback_t *callback);
 
@@ -226,7 +229,7 @@ ras_storage_read(
 RAS_EXPORT int
 ras_storage_write(
   struct ras_storage_s *storage,
-  unsigned int offset,
+  unsigned long int offset,
   unsigned long int size,
   const void *buffer,
   ras_storage_write_callback_t *callback);
@@ -240,7 +243,7 @@ ras_storage_write(
 RAS_EXPORT int
 ras_storage_delete(
   struct ras_storage_s *storage,
-  unsigned int offset,
+  unsigned long int offset,
   unsigned long int size,
   ras_storage_delete_callback_t *callback);
 

@@ -228,7 +228,7 @@ ondestroy(
 }
 
 int
-main (void) {
+main(void) {
   ram_t ram = { 0 };
   ras_storage_init((ras_storage_t *) &ram,
     (ras_storage_options_t) {

@@ -292,7 +292,7 @@ ras_request_dequeue(
 int
 ras_request_callback(
   struct ras_request_s *request,
-  unsigned int err,
+  int err,
   void *value,
   unsigned long int size
 ) {

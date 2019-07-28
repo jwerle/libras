@@ -2,6 +2,7 @@
 #define RAS_H
 
 #include "allocator.h"
+#include "emitter.h"
 #include "platform.h"
 #include "request.h"
 #include "storage.h"
@@ -48,5 +49,17 @@ typedef struct ras_allocator_stats_s ras_allocator_stats_t;
  * of the possible request type the implementation can process.
  */
 typedef enum ras_request_type ras_request_type_t;
+
+/**
+ */
+typedef struct ras_emitter_s ras_emitter_t;
+
+/**
+ */
+typedef struct ras_emitter_listener_s ras_emitter_listener_t;
+
+/**
+ */
+typedef enum ras_event ras_event_t;
 
 #endif
