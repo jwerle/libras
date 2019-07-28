@@ -44,6 +44,7 @@ enum ras_request_type {
   unsigned long int offset;         \
   unsigned long int size;           \
   void *callback;                   \
+  void *shared;                     \
   void *data;
 
 /**
@@ -69,9 +70,9 @@ struct ras_request_options_s {
   ras_request_callback_t *before;   \
   ras_request_callback_t *callback; \
   ras_request_callback_t *after;    \
-  void *done;                       \
+  void *shared;                     \
   void *data;                       \
-  void *shared;
+  void *done;
 
 /**
  * Represents the state for a random access storage operation context.

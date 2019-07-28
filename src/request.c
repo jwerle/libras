@@ -55,6 +55,7 @@ ras_request_init(
   request->callback = ras_request_callback;
   request->pending = 0;
   request->storage = options.storage;
+  request->shared = options.shared;
   request->offset = options.offset;
   request->before = options.before;
   request->after = options.after;

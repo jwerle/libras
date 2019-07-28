@@ -105,6 +105,15 @@ ras_storage_destroy(
   struct ras_storage_s *storage,
   ras_storage_destroy_callback_t *callback
 ) {
+  return ras_storage_destroy_shared(storage, callback, 0);
+}
+
+int
+ras_storage_destroy_shared(
+  struct ras_storage_s *storage,
+  ras_storage_destroy_callback_t *callback,
+  void *shared
+) {
   require(storage, EFAULT);
   require(0 == ras_storage_close(storage, 0), errno);
 
@@ -112,6 +121,7 @@ ras_storage_destroy(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .shared = shared,
       .after = ras_storage_destroy_after,
       .type = RAS_REQUEST_DESTROY,
       .data = 0
@@ -120,7 +130,6 @@ ras_storage_destroy(
   require(request, EFAULT);
   return queue_and_run(storage, request);
 }
-
 static int
 ras_storage_open_after(
   struct ras_request_s *request,
@@ -141,6 +150,15 @@ ras_storage_open(
   struct ras_storage_s *storage,
   ras_storage_open_callback_t *callback
 ) {
+  return ras_storage_open_shared(storage, callback, 0);
+}
+
+int
+ras_storage_open_shared(
+  struct ras_storage_s *storage,
+  ras_storage_open_callback_t *callback,
+  void *shared
+) {
   require(storage, EFAULT);
 
   if (1 == storage->opened && 0 == storage->needs_open) {
@@ -155,6 +173,7 @@ ras_storage_open(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .shared = shared,
       .after = ras_storage_open_after,
       .type = RAS_REQUEST_OPEN,
       .data = 0,
@@ -184,12 +203,22 @@ ras_storage_close(
   struct ras_storage_s *storage,
   ras_storage_close_callback_t *callback
 ) {
+  return ras_storage_close_shared(storage, callback, 0);
+}
+
+int
+ras_storage_close_shared(
+  struct ras_storage_s *storage,
+  ras_storage_close_callback_t *callback,
+  void *shared
+) {
   require(storage, EFAULT);
 
   struct ras_request_s *request = ras_request_new(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .shared = shared,
       .after = ras_storage_close_after,
       .type = RAS_REQUEST_CLOSE,
       .data = 0,
@@ -240,12 +269,24 @@ ras_storage_read(
   unsigned long int size,
   ras_storage_read_callback_t *callback
 ) {
+  return ras_storage_read_shared(storage, offset, size, callback, 0);
+}
+
+int
+ras_storage_read_shared(
+  struct ras_storage_s *storage,
+  unsigned long int offset,
+  unsigned long int size,
+  ras_storage_read_callback_t *callback,
+  void *shared
+) {
   require(storage, EFAULT);
 
   struct ras_request_s *request = ras_request_new(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .shared = shared,
       .offset = offset,
       .before = ras_storage_read_before,
       .after = ras_storage_read_after,
@@ -289,12 +330,25 @@ ras_storage_write(
   const void *buffer,
   ras_storage_write_callback_t *callback
 ) {
+  return ras_storage_write_shared(storage, offset, size, buffer, callback, 0);
+}
+
+int
+ras_storage_write_shared(
+  struct ras_storage_s *storage,
+  unsigned long int offset,
+  unsigned long int size,
+  const void *buffer,
+  ras_storage_write_callback_t *callback,
+  void *shared
+) {
   require(storage, EFAULT);
 
   struct ras_request_s *request = ras_request_new(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .shared = shared,
       .offset = offset,
       .before = ras_storage_write_before,
       .after = ras_storage_write_after,
@@ -342,12 +396,22 @@ ras_storage_stat(
   struct ras_storage_s *storage,
   ras_storage_stat_callback_t *callback
 ) {
+  return ras_storage_stat_shared(storage, callback, 0);
+}
+
+int
+ras_storage_stat_shared(
+  struct ras_storage_s *storage,
+  ras_storage_stat_callback_t *callback,
+  void *shared
+) {
   require(storage, EFAULT);
 
   struct ras_request_s *request = ras_request_new(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .shared = shared,
       .before = ras_storage_stat_before,
       .after = ras_storage_stat_after,
       .type = RAS_REQUEST_STAT,
@@ -387,12 +451,24 @@ ras_storage_delete(
   unsigned long int size,
   ras_storage_delete_callback_t *callback
 ) {
+  return ras_storage_delete_shared(storage, offset, size, callback, 0);
+}
+
+int
+ras_storage_delete_shared(
+  struct ras_storage_s *storage,
+  unsigned long int offset,
+  unsigned long int size,
+  ras_storage_delete_callback_t *callback,
+  void *shared
+) {
   require(storage, EFAULT);
 
   struct ras_request_s *request = ras_request_new(
     (struct ras_request_options_s) {
       .callback = callback,
       .storage = storage,
+      .shared = shared,
       .offset = offset,
       .before = ras_storage_delete_before,
       .after = ras_storage_delete_after,

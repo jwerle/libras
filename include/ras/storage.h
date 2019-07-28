@@ -209,6 +209,12 @@ ras_storage_open(
   struct ras_storage_s *storage,
   ras_storage_open_callback_t *callback);
 
+RAS_EXPORT int
+ras_storage_open_shared(
+  struct ras_storage_s *storage,
+  ras_storage_open_callback_t *callback,
+  void *shared);
+
 /**
  * Reads a buffer from the storage interface. The storage interface must be
  * initialized with a `read()` operation in `struct ras_storage_options_s`
@@ -220,6 +226,14 @@ ras_storage_read(
   unsigned long int offset,
   unsigned long int size,
   ras_storage_read_callback_t *callback);
+
+RAS_EXPORT int
+ras_storage_read_shared(
+  struct ras_storage_s *storage,
+  unsigned long int offset,
+  unsigned long int size,
+  ras_storage_read_callback_t *callback,
+  void *shared);
 
 /**
  * Writes a buffer to the storage interface. The storage interface must be
@@ -234,6 +248,15 @@ ras_storage_write(
   const void *buffer,
   ras_storage_write_callback_t *callback);
 
+RAS_EXPORT int
+ras_storage_write_shared(
+  struct ras_storage_s *storage,
+  unsigned long int offset,
+  unsigned long int size,
+  const void *buffer,
+  ras_storage_write_callback_t *callback,
+  void *shared);
+
 /**
  * Deletes a buffer regionfrom the storage interface. The storage interface
  * must be initialized with a `del()` operation in
@@ -247,6 +270,14 @@ ras_storage_delete(
   unsigned long int size,
   ras_storage_delete_callback_t *callback);
 
+RAS_EXPORT int
+ras_storage_delete_shared(
+  struct ras_storage_s *storage,
+  unsigned long int offset,
+  unsigned long int size,
+  ras_storage_delete_callback_t *callback,
+  void *shared);
+
 /**
  * Queries the storage interface for stats. The storage interface must be
  * initialized with a `stat()` operation `struct ras_storage_options_s`
@@ -257,6 +288,12 @@ ras_storage_stat(
   struct ras_storage_s *storage,
   ras_storage_stat_callback_t *callback);
 
+RAS_EXPORT int
+ras_storage_stat_shared(
+  struct ras_storage_s *storage,
+  ras_storage_stat_callback_t *callback,
+  void *shared);
+
 /**
  * Closes the storage interface. The storage interface must be initialized
  * with a `close()` operation in `struct ras_storage_options_s` given to
@@ -266,6 +303,12 @@ RAS_EXPORT int
 ras_storage_close(
   struct ras_storage_s *storage,
   ras_storage_close_callback_t *callback);
+
+RAS_EXPORT int
+ras_storage_close_shared(
+  struct ras_storage_s *storage,
+  ras_storage_close_callback_t *callback,
+  void *shared);
 
 /**
  * Destroys and frees a pointer to `struct ras_storage_s` to the storage
@@ -278,6 +321,12 @@ RAS_EXPORT int
 ras_storage_destroy(
   struct ras_storage_s *storage,
   ras_storage_destroy_callback_t *callback);
+
+RAS_EXPORT int
+ras_storage_destroy_shared(
+  struct ras_storage_s *storage,
+  ras_storage_destroy_callback_t *callback,
+  void *shared);
 
 /**
  * Returns the head of the queue pointing to a `struct ras_request_s` type and
