@@ -39,6 +39,7 @@ struct ras_emitter_s {
 /**
  */
 enum ras_event {
+  RAS_EVENT_ERROR = 0xff - 1,
   RAS_EVENT_READ = 0xff + 0,
   RAS_EVENT_WRITE = 0xff + 1,
   RAS_EVENT_DELETE = 0xff + 2,

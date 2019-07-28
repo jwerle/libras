@@ -128,7 +128,11 @@ ras_storage_open_after(
   void *value,
   unsigned long int size
 ) {
-  ras_emitter_emit(&request->storage->emitter, RAS_EVENT_OPEN, 0);
+  if (0 == err) {
+    ras_emitter_emit(&request->storage->emitter, RAS_EVENT_OPEN, 0);
+  } else {
+    ras_emitter_emit(&request->storage->emitter, RAS_EVENT_ERROR, &err);
+  }
   return 0;
 }
 
@@ -167,7 +171,11 @@ ras_storage_close_after(
   void *value,
   unsigned long int size
 ) {
-  ras_emitter_emit(&request->storage->emitter, RAS_EVENT_CLOSE, 0);
+  if (0 == err) {
+    ras_emitter_emit(&request->storage->emitter, RAS_EVENT_CLOSE, 0);
+  } else {
+    ras_emitter_emit(&request->storage->emitter, RAS_EVENT_ERROR, &err);
+  }
   return 0;
 }
 
