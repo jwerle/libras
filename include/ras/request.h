@@ -41,6 +41,7 @@ enum ras_request_type {
   struct ras_storage_s *storage;    \
   ras_request_callback_t *before;   \
   ras_request_callback_t *after;    \
+  ras_request_callback_t *emit;     \
   ras_request_callback_t *hook;     \
   unsigned long int offset;         \
   unsigned long int size;           \
@@ -62,15 +63,18 @@ struct ras_request_options_s {
  */
 #define RAS_REQUEST_FIELDS          \
   unsigned int alloc:1;             \
+  unsigned int id;                  \
   int err;                          \
   unsigned long int offset;         \
   unsigned long int size;           \
   unsigned int pending:1;           \
+  unsigned int destroyed:1;         \
   enum ras_request_type type;       \
   struct ras_storage_s *storage;    \
   ras_request_callback_t *before;   \
   ras_request_callback_t *callback; \
   ras_request_callback_t *after;    \
+  ras_request_callback_t *emit;     \
   ras_request_callback_t *hook;     \
   void *shared;                     \
   void *data;                       \

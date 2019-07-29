@@ -11,7 +11,7 @@ run_request(
   struct ras_storage_s *storage,
   struct ras_request_s *request
 ) {
-  if (1 == storage->needs_open) {
+  if (1 == storage->needs_open && 0 == storage->opened) {
     request->err = ras_storage_open(storage, 0);
   }
 
@@ -93,10 +93,24 @@ ras_storage_destroy_after(
   void *value,
   unsigned long int size
 ) {
-  if (0 != request->storage) {
-    ras_storage_free(request->storage);
+  struct ras_storage_s *storage = request->storage;
+
+  if (0 != request) {
     request->storage = 0;
   }
+
+  if (0 != storage) {
+    for (int i = 0; i < RAS_STORAGE_MAX_REQUEST_QUEUE; ++i) {
+      if (0 != storage->queue[i]) {
+        storage->queue[i]->storage = 0;
+        ras_request_free(storage->queue[i]);
+      }
+    }
+
+    storage->queued = 0;
+    ras_storage_free(storage);
+  }
+
   return 0;
 }
 
@@ -133,17 +147,32 @@ ras_storage_destroy_shared(
   return queue_and_run(storage, request);
 }
 static int
-ras_storage_open_after(
+ras_storage_open_emit(
   struct ras_request_s *request,
   int err,
   void *value,
   unsigned long int size
 ) {
+  if (0 == request) {
+    return 0;
+  }
+
+  struct ras_storage_s *storage = request->storage;
+
+  if (0 == storage) {
+    return 0;
+  }
+
+  if (1 == storage->destroyed) {
+    return 0;
+  }
+
   if (0 == err) {
     ras_emitter_emit(&request->storage->emitter, RAS_EVENT_OPEN, 0);
   } else {
     ras_emitter_emit(&request->storage->emitter, RAS_EVENT_ERROR, &err);
   }
+
   return 0;
 }
 
@@ -169,7 +198,7 @@ ras_storage_open_shared(
       .callback = callback,
       .storage = storage,
       .shared = shared,
-      .after = ras_storage_open_after,
+      .emit = ras_storage_open_emit,
       .hook = hook,
       .type = RAS_REQUEST_OPEN,
       .data = 0,
@@ -180,7 +209,7 @@ ras_storage_open_shared(
 }
 
 static int
-ras_storage_close_after(
+ras_storage_close_emit(
   struct ras_request_s *request,
   int err,
   void *value,
@@ -216,7 +245,7 @@ ras_storage_close_shared(
       .callback = callback,
       .storage = storage,
       .shared = shared,
-      .after = ras_storage_close_after,
+      .after = ras_storage_close_emit,
       .hook = hook,
       .type = RAS_REQUEST_CLOSE,
       .data = 0,
@@ -499,14 +528,19 @@ ras_storage_queue_shift(struct ras_storage_s *storage) {
   }
 
   // shift
-  for (int i = 1; i < storage->queued; ++i) {
-    storage->queue[i - 1] = storage->queue[i];
+  for (int i = 0; i < storage->queued; ++i) {
+    storage->queue[i] = storage->queue[i + 1];
+  }
+
+  for (int i = storage->queued; i < RAS_STORAGE_MAX_REQUEST_QUEUE; ++i) {
+    storage->queue[i] = 0;
   }
 
   (void) --storage->queued;
   if (storage->queued < 0) {
     storage->queued = 0;
   }
+
   return head;
 }
 
@@ -522,6 +556,7 @@ ras_storage_queue_push(
   if ((int) storage->queued < 0) {
     storage->queued = 0;
   }
+
   // push
   storage->queue[storage->queued++] = request;
   request->pending = 1;

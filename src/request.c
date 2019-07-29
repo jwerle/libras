@@ -11,6 +11,8 @@ enum {
   _MAX = RAS_MAX_ENUM,
 };
 
+static int nrequests = 0xf + 0;
+
 static int
 ras_request_dequeue(
   struct ras_request_s *request,
@@ -53,6 +55,7 @@ ras_request_init(
   require(memset(request, 0, sizeof(struct ras_request_s)), EFAULT);
 
   request->callback = ras_request_callback;
+  request->destroyed = 0;
   request->pending = 0;
   request->storage = options.storage;
   request->shared = options.shared;
@@ -60,12 +63,14 @@ ras_request_init(
   request->before = options.before;
   request->after = options.after;
   request->alloc = 0;
+  request->emit = options.emit;
   request->hook = options.hook;
   request->type = options.type;
   request->data = options.data;
   request->done = options.callback;
   request->size = options.size;
   request->err = 0;
+  request->id = ++nrequests;
   return 0;
 }
 
@@ -88,6 +93,7 @@ ras_request_new(const struct ras_request_options_s options) {
 void
 ras_request_free(struct ras_request_s *request) {
   if (0 != request && 1 == request->alloc) {
+    request->storage = 0;
     request->alloc = 0;
     memset(request, 0, sizeof(*request));
     ras_free(request);
@@ -246,6 +252,7 @@ ras_request_dequeue(
       case RAS_REQUEST_DESTROY:
         if (0 == storage->destroyed) {
           storage->destroyed = 1;
+          request->destroyed = 1;
           // @TODO(jwerle): HOOK(destroy)
         }
         break;
@@ -306,57 +313,70 @@ ras_request_callback(
   struct ras_storage_s *storage = request->storage;
   ras_request_callback_t *after = request->after;
   ras_request_callback_t *hook = request->hook;
+  ras_request_callback_t *emit = request->emit;
 
+  unsigned int opened = storage->opened;
+  unsigned int closed = storage->closed;
+  unsigned int queued = storage->queued;
   unsigned int type = request->type;
   void *done = request->done;
 
-  int rc = ras_request_dequeue(request, storage, type, err);
-
-  if (0 != hook) {
-    hook(request, err, value, size);
+  if (0 != emit) {
+    emit(request, err, value, size);
   }
 
-  if (0 != done) {
-    switch (type) {
-      case RAS_REQUEST_READ:
-        ((ras_storage_read_callback_t *)done)(storage, err, value, size);
-        break;
+  int needs_free = ras_request_dequeue(request, storage, type, err);
+  unsigned int destroyed = storage->destroyed;
 
-      case RAS_REQUEST_WRITE:
-        ((ras_storage_write_callback_t *)done)(storage, err);
-        break;
-
-      case RAS_REQUEST_DELETE:
-        ((ras_storage_delete_callback_t *)done)(storage, err);
-        break;
-
-      case RAS_REQUEST_STAT:
-        ((ras_storage_stat_callback_t *)done)(
-          storage, err, (struct ras_storage_stats_s *) value);
-        break;
-
-      case RAS_REQUEST_OPEN:
-        ((ras_storage_open_callback_t *)done)(storage, err);
-        break;
-
-      case RAS_REQUEST_CLOSE:
-        ((ras_storage_close_callback_t *)done)(storage, err);
-        break;
-
-      case RAS_REQUEST_DESTROY:
-        ((ras_storage_destroy_callback_t *)done)(storage, err);
-        break;
-
-      case RAS_REQUEST_NONE:
-        break;
-    }
+  if (type == RAS_REQUEST_OPEN && (1 == opened || 1 == destroyed)) {
+    after = 0;
   }
 
-  if (0 != after) {
-    after(request, err, value, size);
+  if (type == RAS_REQUEST_CLOSE && (1 == closed || 1 == destroyed)) {
+    after = 0;
   }
 
-  if (1 == rc) {
+#define CALL(T, ...)                                         \
+  if (0 != hook) { hook(request, err, value, size); }        \
+  if (0 != done) {  ((T) done)(storage, __VA_ARGS__); }      \
+  if (0 != after) { after(request, err, value, size); }      \
+
+  switch (type) {
+    case RAS_REQUEST_READ:
+      CALL(ras_storage_read_callback_t *, err, value, size);
+      break;
+
+    case RAS_REQUEST_WRITE:
+      CALL(ras_storage_write_callback_t *, err);
+      break;
+
+    case RAS_REQUEST_DELETE:
+      CALL(ras_storage_delete_callback_t *, err);
+      break;
+
+    case RAS_REQUEST_STAT:
+      CALL(ras_storage_stat_callback_t *, err, (struct ras_storage_stats_s *) value);
+      break;
+
+    case RAS_REQUEST_OPEN:
+      CALL(ras_storage_open_callback_t *, err);
+      break;
+
+    case RAS_REQUEST_CLOSE:
+      CALL(ras_storage_close_callback_t *, err);
+      break;
+
+    case RAS_REQUEST_DESTROY:
+      CALL(ras_storage_destroy_callback_t *, err);
+      break;
+
+    case RAS_REQUEST_NONE:
+      break;
+  }
+
+#undef CALL
+
+  if (1 == needs_free) {
     ras_request_free(request);
   }
 
