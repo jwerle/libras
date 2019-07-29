@@ -318,7 +318,6 @@ ras_request_callback(
 
   unsigned int opened = storage->opened;
   unsigned int closed = storage->closed;
-  unsigned int queued = storage->queued;
   unsigned int type = request->type;
   void *done = request->done;
 

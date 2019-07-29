@@ -15,7 +15,6 @@ CFLAGS += -Werror
 CFLAGS += -I ../build/include
 CFLAGS += -I ../deps
 CFLAGS += -L $(BUILD_LIBRARY_PATH)
-CFLAGS += -l ras
 CFLAGS += -g
 
 ifeq (Darwin, $(shell uname))
@@ -43,7 +42,7 @@ all: $(TARGETS)
   done
 
 $(TARGETS): $(SOURCES)
-	$(CC) -o $@ $@.c $(DEPS) $(CFLAGS) -D OK_EXPECTED=`cat *.c|grep 'ok('|wc -l`
+	$(CC) -o $@ $(wildcard ../src/*.c) $@.c $(DEPS) $(CFLAGS) -D OK_EXPECTED=`cat *.c|grep 'ok('|wc -l`
 
 .PHONY: clean
 clean:
