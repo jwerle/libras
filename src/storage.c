@@ -399,8 +399,9 @@ ras_storage_stat_before(
   void *value,
   unsigned long int size
 ) {
+  request->size = sizeof(struct ras_storage_stats_s);
   request->data = ras_alloc(sizeof(struct ras_storage_stats_s));
-  memset(request->data, 0, size);
+  memset(request->data, 0, sizeof(struct ras_storage_stats_s));
   return 0;
 }
 

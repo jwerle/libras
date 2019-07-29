@@ -308,6 +308,7 @@ ras_request_callback(
   require(request, EFAULT);
   require(request->storage, EFAULT);
 
+  request->size = size;
   request->err = err;
 
   struct ras_storage_s *storage = request->storage;
