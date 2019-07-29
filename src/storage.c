@@ -164,14 +164,6 @@ ras_storage_open_shared(
 ) {
   require(storage, EFAULT);
 
-  if (1 == storage->opened && 0 == storage->needs_open) {
-    if (0 != callback) {
-      callback(storage, 0);
-    }
-
-    return 0;
-  }
-
   struct ras_request_s *request = ras_request_new(
     (struct ras_request_options_s) {
       .callback = callback,
