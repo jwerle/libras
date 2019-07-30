@@ -16,14 +16,14 @@ extern "C" {
  */
 
 #ifndef OK_VERSION
-#define OK_VERSION "0.0.1"
+#define OK_VERSION "0.2.0"
 #endif
 
 /**
  * No-op/void `ok()` function
  */
 #ifndef okx
-#define okx(_) (void) (_);
+#define okx(...) (void) (0);
 #endif
 
 /**
@@ -32,7 +32,7 @@ extern "C" {
  */
 
 void
-ok (const char *);
+ok (const char *, ...);
 
 /**
  * Completes tests and asserts that
