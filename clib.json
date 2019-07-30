@@ -1,0 +1,26 @@
+{
+  "name": "ras",
+  "version": "0.3.7",
+  "description": "A C99 library for creating random access storage interfaces.",
+  "repo": "jwerle/libras",
+  "src": [
+    "include/ras/allocator.h",
+    "include/ras/emitter.h",
+    "include/ras/platform.h",
+    "include/ras/request.h",
+    "include/ras/storage.h",
+    "include/ras/version.h",
+    "include/ras/ras.h",
+    "src/allocator.c",
+    "src/emitter.c",
+    "src/request.c",
+    "src/require.h",
+    "src/storage.c",
+    "src/version.c",
+    "mk/brief.mk",
+    "Makefile.in",
+    "configure",
+    "README.md",
+    "LICENSE"
+  ]
+}
