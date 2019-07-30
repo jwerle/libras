@@ -1,6 +1,6 @@
 {
   "name": "@jwerle/libras",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "clib": true,
   "description": "A C99 library for creating random access storage interfaces.",
   "directories": {
