@@ -7,28 +7,8 @@
     "example": "example",
     "test": "test"
   },
-  "repo": "jwerle/libras",
-  "src": [
-    "include/ras/allocator.h",
-    "include/ras/emitter.h",
-    "include/ras/platform.h",
-    "include/ras/request.h",
-    "include/ras/storage.h",
-    "include/ras/version.h",
-    "include/ras/ras.h",
-    "src/allocator.c",
-    "src/emitter.c",
-    "src/request.c",
-    "src/require.h",
-    "src/storage.c",
-    "src/version.c",
-    "mk/brief.mk",
-    "Makefile.in",
-    "configure",
-    "README.md",
-    "LICENSE"
-  ],
   "scripts": {
+    "version": "./scripts/update-clib-json && git add clib.json",
     "test": "make test"
   },
   "repository": {
